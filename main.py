@@ -156,13 +156,27 @@ def main_cli() -> None:
         action="store_true",
         help="Auto-detect optimal width based on image resolution"
     )
+    parser.add_argument(
+        "--fastfetch",
+        action="store_true",
+        help="Fast mode: use width=50 for quick preview"
+    )
     
     args = parser.parse_args()
+    
+    # Handle width precedence: --fastfetch > --width > default(120)
+    # --fastfetch sets width to 50, --auto uses auto-detection
+    if args.fastfetch:
+        final_width = 50
+    elif args.auto:
+        final_width = None
+    else:
+        final_width = args.width
     
     try:
         ascii_art = run_conversion(
             input_path=args.input,
-            output_width=args.width if not args.auto else None,
+            output_width=final_width,
             output_file=args.output,
             invert=args.invert,
             auto=args.auto
